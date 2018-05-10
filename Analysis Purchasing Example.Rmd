@@ -17,8 +17,16 @@ library(bupaR)
 
 ```{r}
 Roh <- read.csv("PurchasingExample.csv")
-Log <- Roh %>% gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% 
+Roh.clean <- Roh %>% 
+  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity))
+
+Roh.clean <- gsub("Supplier's", "Suppliers", Roh$Activity)
+
+Log <- Roh %>% 
+  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% 
+  gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% 
   mutate(Time = ymd_hms(Time)) %>% #arrange nach Time
+  #arrange(Time) %>% 
   mutate(activity_instance = 1:nrow(.)) %>% 
   eventlog(case_id = "Case.ID",
            activity_id = "Activity",
@@ -27,20 +35,10 @@ Log <- Roh %>% gather(Start.Timestamp, Complete.Timestamp, key = "Status", value
            timestamp = "Time",
            resource_id = "Resource")
 
-Log %>% summary
+Log %>% process_map()
 
-Log %>% n_activities
-Log %>% n_events
-Log %>% n_cases
-Log %>% n_traces
-Log %>% n_resources
-Log %>% traces
 
-devtools::install_github("gertjanssenswillen/processmapr")
-
-Log %>% filter_case(c(155)) %>% process_map()
-
-Log %>% filter_trace_frequency(percentage = 0.8) %>% process_map(type = frequency("absolute"))
+Log %>% filter_trace_frequency(percentage = 1.0) %>% process_map(type = frequency("absolute"))
 
 ```
 
