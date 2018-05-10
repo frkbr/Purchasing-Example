@@ -1,5 +1,5 @@
 ---
-title: "Public Purchasing Example"
+title: "Fluxicon Purchasing Example"
 output: html_document
 ---
 
@@ -29,6 +29,5 @@ Log <- Roh %>%
            resource_id = "Resource")
 
 Log %>% animate_process(token_color = "orange", animation_duration = 100)
-
 ```
 
