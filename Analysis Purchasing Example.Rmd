@@ -1,0 +1,46 @@
+---
+title: "Public Purchasing Example"
+author: "Frank"
+date: "10.5.2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Hide all possible output but still evaluate the code, e.g., hide the R source code (echo=FALSE), hide text output (results='hide'), hide warnings, hide messages, hide plots, and so on.
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center")
+
+library(tidyverse)
+library(lubridate)
+library(bupaR)
+```
+
+
+```{r}
+Roh <- read.csv("PurchasingExample.csv")
+Log <- Roh %>% gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% 
+  mutate(Time = ymd_hms(Time)) %>% #arrange nach Time
+  mutate(activity_instance = 1:nrow(.)) %>% 
+  eventlog(case_id = "Case.ID",
+           activity_id = "Activity",
+           activity_instance_id = "activity_instance",
+           lifecycle_id = "Status",
+           timestamp = "Time",
+           resource_id = "Resource")
+
+Log %>% summary
+
+Log %>% n_activities
+Log %>% n_events
+Log %>% n_cases
+Log %>% n_traces
+Log %>% n_resources
+Log %>% traces
+
+devtools::install_github("gertjanssenswillen/processmapr")
+
+Log %>% filter_case(c(155)) %>% process_map()
+
+Log %>% filter_trace_frequency(percentage = 0.8) %>% process_map(type = frequency("absolute"))
+
+```
+
