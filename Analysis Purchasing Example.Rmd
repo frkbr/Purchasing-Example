@@ -1,12 +1,9 @@
 ---
 title: "Public Purchasing Example"
-author: "Frank"
-date: "10.5.2018"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-# Hide all possible output but still evaluate the code, e.g., hide the R source code (echo=FALSE), hide text output (results='hide'), hide warnings, hide messages, hide plots, and so on.
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center")
 
 library(tidyverse)
@@ -20,11 +17,10 @@ library(processanimateR)
 Roh <- read.csv("PurchasingExample.csv")
 
 Log <- Roh %>% 
-  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% # ' ersetzen, damit kein Syntax Error bei process_map
-  gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% 
-  mutate(Time = ymd_hms(Time)) %>% #arrange nach Time
-  #arrange(Time) %>% 
-  mutate(activity_instance = 1:nrow(.)) %>% 
+  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% # remove ' to avoid syntax error with process_map function
+  gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% # Convert to long format
+  mutate(Time = ymd_hms(Time)) %>%
+  mutate(activity_instance = 1:nrow(.)) %>% # Add artificial activity_instance_id
   eventlog(case_id = "Case.ID",
            activity_id = "Activity",
            activity_instance_id = "activity_instance",
@@ -32,11 +28,7 @@ Log <- Roh %>%
            timestamp = "Time",
            resource_id = "Resource")
 
-Log %>% process_map()
-
-Log %>% animate_process(token_color = "orange", animation_duration = 200)
-
-Log %>% filter_trace_frequency(percentage = 1.0) %>% process_map(type = frequency("absolute"))
+Log %>% animate_process(token_color = "orange", animation_duration = 100)
 
 ```
 
