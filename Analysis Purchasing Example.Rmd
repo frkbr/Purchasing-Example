@@ -12,18 +12,15 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align 
 library(tidyverse)
 library(lubridate)
 library(bupaR)
+library(processanimateR)
 ```
 
 
 ```{r}
 Roh <- read.csv("PurchasingExample.csv")
-Roh.clean <- Roh %>% 
-  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity))
-
-Roh.clean <- gsub("Supplier's", "Suppliers", Roh$Activity)
 
 Log <- Roh %>% 
-  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% 
+  mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% # ' ersetzen, damit kein Syntax Error bei process_map
   gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% 
   mutate(Time = ymd_hms(Time)) %>% #arrange nach Time
   #arrange(Time) %>% 
@@ -37,6 +34,7 @@ Log <- Roh %>%
 
 Log %>% process_map()
 
+Log %>% animate_process(token_color = "orange", animation_duration = 200)
 
 Log %>% filter_trace_frequency(percentage = 1.0) %>% process_map(type = frequency("absolute"))
 
