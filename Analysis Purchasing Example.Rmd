@@ -12,13 +12,12 @@ library(bupaR)
 library(processanimateR)
 ```
 
-
 ```{r}
 Roh <- read.csv("PurchasingExample.csv")
 
 Log <- Roh %>% 
   mutate(Activity = gsub("Supplier's", "Suppliers", Roh$Activity)) %>% # remove ' to avoid syntax error with process_map function
-  gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% # Convert to long format
+  gather(Start.Timestamp, Complete.Timestamp, key = "Status", value = "Time") %>% # Transpose Start/Complete timestamps to long format
   mutate(Time = ymd_hms(Time)) %>%
   mutate(activity_instance = 1:nrow(.)) %>% # Add artificial activity_instance_id
   eventlog(case_id = "Case.ID",
@@ -28,6 +27,7 @@ Log <- Roh %>%
            timestamp = "Time",
            resource_id = "Resource")
 
-Log %>% animate_process(token_color = "orange", animation_duration = 100)
+Log %>% animate_process(token_color = "orange")
 ```
 
+Compared with [this animation](https://www.youtube.com/watch?v=-umuLfQWCLo) of the same process in Disco, the bottleneck at the activity "Analyze Request for Quotation" is not visible here. Perhaps there might be a way to show the movement of the tokens along the arrows and keep the different tokens separate from each other. This could make congestions more visible.
