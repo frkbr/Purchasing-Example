@@ -9,7 +9,8 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align 
 library(tidyverse)
 library(lubridate)
 library(bupaR)
-library(processanimateR)
+source("https://install-github.me/r-lib/remotes")
+remotes::install_github("fmannhardt/processanimateR@v0.2.0")
 ```
 
 ```{r}
@@ -27,7 +28,7 @@ Log <- Roh %>%
            timestamp = "Time",
            resource_id = "Resource")
 
-Log %>% animate_process(token_color = "orange")
+Log %>% animate_process(token_color = "orange",animation_jitter = 10, rankdir = "TB")
 ```
 
 Compared with [this animation](https://www.youtube.com/watch?v=-umuLfQWCLo) of the same process in Disco, the bottleneck at the activity "Analyze Request for Quotation" is not visible here. Perhaps there might be a way to show the movement of the tokens along the arrows and keep the different tokens separate from each other. This could make congestions more visible.
